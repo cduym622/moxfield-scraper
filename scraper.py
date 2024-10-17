@@ -1,0 +1,85 @@
+import requests
+import json
+import random
+from copy import deepcopy
+
+
+# Implements code by thebear123's MTG-to-XMAGE repo
+# https://github.com/thebear132/MTG-To-XMage/tree/main
+
+
+# let's avoid getting blacklisted
+user_agent_list = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36',
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 14_4_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1',
+    'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36 Edg/87.0.664.75',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; Trident/5.0)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0; MDDCJS)',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393',
+    'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)',
+]
+
+deckId = "6brXVsMDXEi5e8ZnX3aCwA"
+
+DeckListTemplate = {  # Remember to deepcopy() when copying this template
+    "format": "",       # Format
+    "companions": [],   # List of <CardFormatTemplate>
+    "commanders": [],   # List of <CardFormatTemplate>
+    "mainboard": [],    # List of <CardFormatTemplate>
+    "sideboard": []     # List of <CardFormatTemplate>
+}
+
+CardFormatTemplate = {
+    "quantity": 0,
+    "name": "",         # Lightning Bolt
+}
+
+url = "https://api.moxfield.com/v2/decks/all/" + deckId
+# print(f"Grabbing decklist <{deckId}>")                        #Logging
+r = requests.get(url, headers={'User-Agent': user_agent_list[random.randint(0, len(user_agent_list)-1)]})
+jsonGet = json.loads(r.text)
+
+deckList = deepcopy(DeckListTemplate)
+deckList["format"] = jsonGet["format"]
+
+if jsonGet["commandersCount"] != 0:
+    for cmdr in jsonGet["commanders"]:
+                cardFormat = deepcopy(CardFormatTemplate)
+                specificCard = jsonGet["commanders"][cmdr]
+
+                cardFormat["name"] = cmdr
+                cardFormat["quantity"] = specificCard["quantity"]
+                deckList["commanders"].append(cardFormat)
+
+    if jsonGet["companionsCount"] != 0:
+        print(url)
+        for comp in jsonGet["companions"]:
+                cardFormat = deepcopy(CardFormatTemplate)
+                specificCard = jsonGet["companions"][comp]
+                
+                cardFormat["name"] = comp
+                cardFormat["quantity"] = specificCard["quantity"]
+                deckList["companions"].append(cardFormat)
+
+    for card in jsonGet["mainboard"]:
+            cardFormat = deepcopy(CardFormatTemplate)
+            specificCard = jsonGet["mainboard"][card]
+
+            cardFormat["name"] = card
+            cardFormat["quantity"] = specificCard["quantity"]
+            deckList["mainboard"].append(cardFormat)
+
+    for card in jsonGet["sideboard"]:
+            cardFormat = deepcopy(CardFormatTemplate)
+            specificCard = jsonGet["sideboard"][card]
+
+            cardFormat["name"] = card
+            cardFormat["quantity"] = specificCard["quantity"]
+            deckList["sideboard"].append(cardFormat)
+
+decklist = open("decklist.json", "w")
+json.dump(deckList, decklist)
