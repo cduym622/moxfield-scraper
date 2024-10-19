@@ -1,8 +1,10 @@
 import requests
 import random
 import json
-from config import user_agent_list
+from config import user_agent_list , DeckListTemplate , CardFormatTemplate
+from copy import deepcopy
 
+# gets all ids associated with a user
 def getUserDecks(username):
     # set the url to include the specified username
     url = (
@@ -19,9 +21,53 @@ def getUserDecks(username):
     # extract all publicId's of decks associated with the user
     ids = [item["publicId"] for item in j["data"]]
     # store those id's in their own json
-    ids2 = open("id2.json", "w")
-    json.dump(ids, ids2)
-    # store the full json information from the original request
-    deckIds = open("ids.json", "w")
-    json.dump(j, deckIds)
-    return j
+    return ids
+
+
+def convertIdToDecklist(deckId, filename):
+
+    url = "https://api.moxfield.com/v2/decks/all/" + deckId
+    # print(f"Grabbing decklist <{deckId}>")                        #Logging
+    r = requests.get(url, headers={'User-Agent': user_agent_list[random.randint(0, len(user_agent_list)-1)]})
+    jsonGet = json.loads(r.text)
+
+    deckList = deepcopy(DeckListTemplate)
+    deckList["format"] = jsonGet["format"]
+
+    if jsonGet["commandersCount"] != 0:
+        for cmdr in jsonGet["commanders"]:
+                    cardFormat = deepcopy(CardFormatTemplate)
+                    specificCard = jsonGet["commanders"][cmdr]
+
+                    cardFormat["name"] = cmdr
+                    cardFormat["quantity"] = specificCard["quantity"]
+                    deckList["commanders"].append(cardFormat)
+
+    if jsonGet["companionsCount"] != 0:
+            print(url)
+            for comp in jsonGet["companions"]:
+                    cardFormat = deepcopy(CardFormatTemplate)
+                    specificCard = jsonGet["companions"][comp]
+                    
+                    cardFormat["name"] = comp
+                    cardFormat["quantity"] = specificCard["quantity"]
+                    deckList["companions"].append(cardFormat)
+
+    for card in jsonGet["mainboard"]:
+                cardFormat = deepcopy(CardFormatTemplate)
+                specificCard = jsonGet["mainboard"][card]
+
+                cardFormat["name"] = card
+                cardFormat["quantity"] = specificCard["quantity"]
+                deckList["mainboard"].append(cardFormat)
+
+    for card in jsonGet["sideboard"]:
+                cardFormat = deepcopy(CardFormatTemplate)
+                specificCard = jsonGet["sideboard"][card]
+
+                cardFormat["name"] = card
+                cardFormat["quantity"] = specificCard["quantity"]
+                deckList["sideboard"].append(cardFormat)
+
+    decklist = open(filename, "w")
+    json.dump(deckList, decklist)
