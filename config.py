@@ -11,3 +11,16 @@ user_agent_list = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393',
     'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)',
 ]
+
+DeckListTemplate = {  # Remember to deepcopy() when copying this template
+    "format": "",       # Format
+    "companions": [],   # List of <CardFormatTemplate>
+    "commanders": [],   # List of <CardFormatTemplate>
+    "mainboard": [],    # List of <CardFormatTemplate>
+    "sideboard": []     # List of <CardFormatTemplate>
+}
+
+CardFormatTemplate = {
+    "quantity": 0,
+    "name": "",         # Lightning Bolt
+}

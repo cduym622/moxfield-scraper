@@ -2,7 +2,7 @@ import requests
 import json
 import random
 from copy import deepcopy
-from config import user_agent_list
+from config import user_agent_list , DeckListTemplate , CardFormatTemplate
 import helpers
 
 
@@ -13,19 +13,6 @@ import helpers
 # let's avoid getting blacklisted
 
 deckId = "6brXVsMDXEi5e8ZnX3aCwA"
-
-DeckListTemplate = {  # Remember to deepcopy() when copying this template
-    "format": "",       # Format
-    "companions": [],   # List of <CardFormatTemplate>
-    "commanders": [],   # List of <CardFormatTemplate>
-    "mainboard": [],    # List of <CardFormatTemplate>
-    "sideboard": []     # List of <CardFormatTemplate>
-}
-
-CardFormatTemplate = {
-    "quantity": 0,
-    "name": "",         # Lightning Bolt
-}
 
 ids = helpers.getUserDecks("BWheelerMTG")
 
