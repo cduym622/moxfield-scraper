@@ -3,6 +3,7 @@ import random
 import json
 from config import user_agent_list , DeckListTemplate , CardFormatTemplate
 from copy import deepcopy
+from pathlib import Path
 
 # gets all ids associated with a user
 def getUserDecks(username):
@@ -24,7 +25,7 @@ def getUserDecks(username):
     return ids
 
 
-def convertIdToDecklist(deckId, filename):
+def convertIdToDecklist(deckId, filename, basePath):
 
     url = "https://api.moxfield.com/v2/decks/all/" + deckId
     # print(f"Grabbing decklist <{deckId}>")                        #Logging
@@ -69,5 +70,6 @@ def convertIdToDecklist(deckId, filename):
                 cardFormat["quantity"] = specificCard["quantity"]
                 deckList["sideboard"].append(cardFormat)
 
-    decklist = open(filename, "w")
-    json.dump(deckList, decklist)
+
+    decklistLocale = open(basePath / filename, "w")
+    json.dump(deckList, decklistLocale)
