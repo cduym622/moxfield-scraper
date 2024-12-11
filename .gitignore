@@ -2,3 +2,4 @@ venv/
 *.json
 test.py
 __pycache__/
+*.jpg

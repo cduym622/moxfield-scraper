@@ -16,7 +16,8 @@ def getUserDecks(username):
     print(f"Grabbing <{username}>'s public decks from " + url)
 
     # send a request to get the information of a moxfield user
-    r = requests.get(url, headers={'User-Agent': user_agent_list[random.randint(0, len(user_agent_list)-1)]})
+    r = requests.get(url, headers=
+                     {'User-Agent': user_agent_list[random.randint(0, len(user_agent_list)-1)]})
     # load the response as a json
     print(r)
     j = json.loads(r.text)
